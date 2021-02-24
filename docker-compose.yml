@@ -5,10 +5,4 @@ services:
     container_name: 
       ft_api_doc
     ports: 
-    - 8080:8080
-    volumes: 
-    - ./:/tmp
-    environment: 
-    -  SWAGGER_FILE=/tmp/api.yml
-
-
+	- 8080:8080
