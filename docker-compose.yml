@@ -1,0 +1,14 @@
+services: 
+  apidoc:
+    image: 
+      swaggerapi/swagger-editor
+    container_name: 
+      ft_api_doc
+    ports: 
+    - 8080:8080
+    volumes: 
+    - ./:/tmp
+    environment: 
+    -  SWAGGER_FILE=/tmp/api.yml
+
+
