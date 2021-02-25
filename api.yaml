@@ -191,7 +191,11 @@ components:
           type: "string"
     PaymentDetails:
       oneOf:
-        - $ref: "/components/schemas/FaehrCardPayment"
+        - $ref: "#/components/schemas/FaehrCardPayment"
+        - $ref: "#/components/schemas/CashPayment"
+        - $ref: "#/components/schemas/ECCardPayment"
+        - $ref: "#/components/schemas/WirePayment"
+        - $ref: "#/components/schemas/PayPalPayment"
     FaehrCardPayment:
       description: "Payment Details for FaehrCard Payments."
       type: "object"
