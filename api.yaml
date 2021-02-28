@@ -90,6 +90,31 @@ paths:
           description: "invalid id"
         404:
           description: "no machine with given uuid found"
+  /machines/{uuid}/config:
+    patch:
+      description: "Change the configuration of a vending machine."
+      parameters:
+      - name: "uuid"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+          format: "uuid"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MachineConfiguration"
+      responses:
+        204:
+          description: "Updated config of machine."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MachineStatus"
+        404:
+          description: "no machine with supplied uuid found"
   /faehrCard/{uuid}:
     get:
       description: "Return full details on a single FaehrCard."
@@ -177,6 +202,23 @@ paths:
       responses:
         201:
           description: "The ticket sale has been recorded, if applicable, payment methods have been charged"
+  /ticketSales/{uuid}/invalidateReturn:
+    delete:
+      description: "Invalidate a return ticket."
+      parameters:
+      - name: "uuid"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+          format: "uuid"
+      responses:
+        204:
+          description: "The return ticket has been invalidated."
+        402:
+          description: "The ticket with the uuid was found, but it isn't a valid return ticket."
+        404:
+          description: "No Ticket with the supplied uuid has been found."
 components:
   schemas:
     ApiResponse:
@@ -262,6 +304,9 @@ components:
         issuedAt:
           type: "string"
           format: "date-time"
+        returnValid:
+          type: "boolean"
+          nullable: true
         from:
           $ref: "#/components/schemas/MachineLocations"
         payment:
@@ -287,6 +332,10 @@ components:
           description: "whether or not a return trip has been purchased"
           type: "boolean"
         reduced:
+          description: "reduced fare for physically disabled persons and children under the age of 14"
+          type: "boolean"
+        staff:
+          description: "only for staff members"
           type: "boolean"
     TopUp:
       type: "object"
@@ -314,12 +363,34 @@ components:
         initial:
           description: "Describes whether the top up was done when the card was issued"
           type: "boolean"
+    StaffMember:
+      description: "Staff members work for the ferry and are granted free rides."
+      type: "object"
+      properties:
+        uuid: 
+          type: "string"
+          format: "uuid"
+        firstName:
+          type: "string"
+        lastName:
+          type: "string"
+        role:
+          type: "string"
+          enum:
+            - Admin 
+            - Captain
+            - Cashier
+            - other
     FaehrCard:
       type: "object"
       properties:
         uuid:
           type: "string"
           format: "uuid"
+        ownedBy:
+          type: "string"
+          format: "uuid"
+          nullable: true
         balance:
           type: "integer"
         issedAt: 
