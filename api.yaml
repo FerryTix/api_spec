@@ -250,8 +250,13 @@ components:
       description: "Payment Details for Cash Payments."
       type: "object"
       properties:
-        coins:
-          description: "List of coins the payment consists of."
+        denominations:
+          description: "List of coins and bills the payment consists of."
+          type: "array"
+          items: 
+            type: "integer"
+        change:
+          description: "List of coins and bills the change consists of."
           type: "array"
           items: 
             type: "integer"
@@ -260,7 +265,7 @@ components:
       properties: 
         name: 
           type: "string"
-    WirePayment:
+    BankTransferPayment:
       type: "object"
       properties: 
         name: 
@@ -276,7 +281,7 @@ components:
         - "FaehrCard"
         - "Cash"
         - "ECCard"
-        - "Wire"
+        - "BankTransfer"
         - "PayPal"
     Payment:
       description: "A payment for a ticket sale."
@@ -308,7 +313,7 @@ components:
           type: "boolean"
           nullable: true
         from:
-          $ref: "#/components/schemas/MachineLocations"
+          $ref: "#/components/schemas/MachineLocation"
         payment:
           $ref: "#/components/schemas/Payment"
         positions:
@@ -316,10 +321,8 @@ components:
           items:
             type: "object"
             properties:
-              ticketClass:
-                $ref: "#/components/schemas/TicketClass"
-              singleFare:
-                type: "integer"
+              fare:
+                $ref: "#/components/schemas/Fare"
               count:
                 type: "integer"
     TicketClass:
@@ -375,12 +378,14 @@ components:
         lastName:
           type: "string"
         role:
-          type: "string"
-          enum:
-            - Admin 
-            - Captain
-            - Cashier
-            - other
+          $ref: "#/components/schemas/StaffRole"
+    StaffRole:
+      type: "string"
+      enum:
+        - Admin 
+        - Captain
+        - Cashier
+        - other
     FaehrCard:
       type: "object"
       properties:
@@ -393,12 +398,13 @@ components:
           nullable: true
         balance:
           type: "integer"
-        issedAt: 
+        issuedAt: 
           type: "string"
           format: "date-time"
         issuedBy:
           type: "string"
           format: "uuid"
+          nullable: true
         topUps:
           type: "array"
           items:
@@ -445,7 +451,7 @@ components:
         - setSignalGreen
         - stopVending
         - startVending
-    MachineLocations:
+    MachineLocation:
       type: "string"
       enum: 
         - Bislich
@@ -457,14 +463,11 @@ components:
           type: "string"
           format: "uuid"
         location:
-          $ref: "#/components/schemas/MachineLocations"
+          $ref: "#/components/schemas/MachineLocation"
     MachineStatus:
       description: "The status of a machine, generated partly by the backend"
       type: "object"
       properties:
-        signal:
-          type: "string"
-          enum: [GREEN, RED]
         vending: 
           type: "boolean"
         waiting:
@@ -475,7 +478,7 @@ components:
       description: "A passenger waiting in the waiting area"
       type: "object"
       properties:
-        ticketType: 
+        ticketClass: 
           $ref: "#/components/schemas/TicketClass"
         waitingSince:
           type: "string"
