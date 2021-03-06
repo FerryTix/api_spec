@@ -221,17 +221,7 @@ paths:
           description: "No Ticket with the supplied uuid has been found."
 components:
   schemas:
-    ApiResponse:
-      type: "object"
-      properties:
-        code:
-          type: "integer"
-          format: "int32"
-        type:
-          type: "string"
-        message:
-          type: "string"
-    PaymentDetails:
+    PaymentMethod:
       oneOf:
         - $ref: "#/components/schemas/FaehrCardPayment"
         - $ref: "#/components/schemas/CashPayment"
@@ -275,14 +265,6 @@ components:
       properties: 
         name: 
           type: "string"
-    PaymentMethod:
-      type: "string"
-      enum:
-        - "FaehrCard"
-        - "Cash"
-        - "ECCard"
-        - "BankTransfer"
-        - "PayPal"
     Payment:
       description: "A payment for a ticket sale."
       type: "object"
@@ -294,8 +276,6 @@ components:
           type: "integer"
         method:
           $ref: "#/components/schemas/PaymentMethod"
-        details:
-          $ref: "#/components/schemas/PaymentDetails"
     TicketSale:
       description: "A collection of tickets that are paid and used at once."
       type: "object"
@@ -405,14 +385,6 @@ components:
           type: "string"
           format: "uuid"
           nullable: true
-        topUps:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/TopUp"
-        charges:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/TicketSale"
     MachineConfiguration:
       description: "Object to hold configuration for vending machines, data that can be changed by admins"
       type: "object"
