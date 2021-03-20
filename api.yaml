@@ -42,6 +42,33 @@ paths:
           description: "invalid id"
         404:
           description: "no machine with given uuid found"
+  /machines/{uuid}/replacePaperRoll:
+    post:
+      description: "Replace receipt paper roll."
+      parameters:
+      - name: "uuid"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+          format: "uuid"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "integer"
+      responses:
+        201:
+          description: "Reset Paper fill level."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MachineStatus"
+        400:
+          description: "invalid id"
+        404:
+          description: "no machine with given uuid found"
   /machines/{uuid}/status:
     get:
       description: "Returns a single vending machine's status."
@@ -63,7 +90,51 @@ paths:
           description: "invalid id"
         404:
           description: "no machine with given uuid found"
-  /machines/{uuid}/command:
+    patch:
+      description: "Update machine status manually."
+      parameters:
+      - name: "uuid"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+          format: "uuid"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MachineStatus"
+      responses:
+        200:
+          description: "Updated config of machine."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MachineStatus"
+        404:
+          description: "no machine with given uuid found"
+  /machines/{uuid}/commands:
+    get:
+      description: "Retrieve a command for a vending machine with the given id. May return after an undefined timeout"
+      parameters:
+      - name: "uuid"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+          format: "uuid"
+      responses:
+        200:
+          description: "command found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MachineCommand"
+        400:
+          description: "invalid id"
+        404:
+          description: "no machine with given uuid found"
     post:
       description: "Execute a command on a single vending machine."
       parameters:
@@ -90,6 +161,22 @@ paths:
           description: "invalid id"
         404:
           description: "no machine with given uuid found"
+  /machines/defaultConfig:
+    patch:
+      description: "Change the default configuration for all vending machines."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MachineConfiguration"
+      responses:
+        200:
+          description: "Updated default config of all machines."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MachineConfiguration"
   /machines/{uuid}/config:
     patch:
       description: "Change the configuration of a vending machine."
@@ -107,12 +194,12 @@ paths:
             schema:
               $ref: "#/components/schemas/MachineConfiguration"
       responses:
-        204:
+        200:
           description: "Updated config of machine."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MachineStatus"
+                $ref: "#/components/schemas/MachineConfiguration"
         404:
           description: "no machine with supplied uuid found"
   /faehrCard/{uuid}:
@@ -226,7 +313,7 @@ components:
         - $ref: "#/components/schemas/FaehrCardPayment"
         - $ref: "#/components/schemas/CashPayment"
         - $ref: "#/components/schemas/ECCardPayment"
-        - $ref: "#/components/schemas/WirePayment"
+        - $ref: "#/components/schemas/BankTransferPayment"
         - $ref: "#/components/schemas/PayPalPayment"
     FaehrCardPayment:
       description: "Payment Details for FaehrCard Payments."
@@ -299,12 +386,16 @@ components:
         positions:
           type: "array"
           items:
-            type: "object"
-            properties:
-              fare:
-                $ref: "#/components/schemas/Fare"
-              count:
-                type: "integer"
+            $ref: "#/components/schemas/Position"
+        signature:
+          type: "string"
+    Position:
+      type: "object"
+      properties:
+        fare:
+          $ref: "#/components/schemas/Fare"
+        count:
+          type: "integer"
     TicketClass:
       type: "object"
       properties:
@@ -346,6 +437,8 @@ components:
         initial:
           description: "Describes whether the top up was done when the card was issued"
           type: "boolean"
+        signature:
+          type: "string"
     StaffMember:
       description: "Staff members work for the ferry and are granted free rides."
       type: "object"
@@ -434,6 +527,8 @@ components:
         uuid:
           type: "string"
           format: "uuid"
+        publicKey:
+          type: "string"
         location:
           $ref: "#/components/schemas/MachineLocation"
     MachineStatus:
@@ -442,6 +537,25 @@ components:
       properties:
         vending: 
           type: "boolean"
+        batteryCharge:
+          type: "number"
+        estimatedReceiptPaperFillLevel:
+          type: "number"
+          example: 0.98
+        receiptPaperRollLength:
+          type: "integer"
+          example: 50
+        cpuTemperature:
+          type: "number"
+        ticketsSoldToday:
+          type: "object"
+          properties:
+            withBicycle:
+              type: "integer"
+            withoutBicycle:
+              type: "integer"
+        volumeOfSalesToday:
+          type: "integer"
         waiting:
           type: "array"
           items: 
