@@ -576,3 +576,10 @@ components:
         waitingSince:
           type: "string"
           format: "date-time"
+  securitySchemes:
+    ApiKeyAuth:        
+      type: apiKey
+      in: header       
+      name: X-API-KEY  
+security:
+  - ApiKeyAuth: []     
