@@ -387,6 +387,8 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Position"
+        saleCounter:
+          type: "integer"
         signature:
           type: "string"
     Position:
@@ -437,6 +439,8 @@ components:
         initial:
           description: "Describes whether the top up was done when the card was issued"
           type: "boolean"
+        saleCounter:
+          type: "integer"
         signature:
           type: "string"
     StaffMember:
@@ -560,6 +564,9 @@ components:
           type: "array"
           items: 
             $ref: "#/components/schemas/WaitingPassenger"
+        saleCounter:
+          type: "integer"
+          description: "Current sale counter. Each vending machine has its own counter, that increases when a sale (TicketSale or TopUp) is completed. The sale counter can't be changed from the outside."
     WaitingPassenger:
       description: "A passenger waiting in the waiting area"
       type: "object"
