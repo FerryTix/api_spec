@@ -42,33 +42,6 @@ paths:
           description: "invalid id"
         404:
           description: "no machine with given uuid found"
-  /machines/{uuid}/replacePaperRoll:
-    post:
-      description: "Replace receipt paper roll."
-      parameters:
-      - name: "uuid"
-        in: "path"
-        required: true
-        schema:
-          type: "string"
-          format: "uuid"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: "integer"
-      responses:
-        201:
-          description: "Reset Paper fill level."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MachineStatus"
-        400:
-          description: "invalid id"
-        404:
-          description: "no machine with given uuid found"
   /machines/{uuid}/status:
     get:
       description: "Returns a single vending machine's status."
@@ -512,14 +485,22 @@ components:
           $ref: "#/components/schemas/TicketClass"
         fare: 
           type: "integer"
+    RefillPaperRollCommand:
+      type: "object"
+      properties:
+        rollLength: 
+          type: "number"
     MachineCommand:
       description: "An order issued by an admin for a machine to perform an action"
-      type: "string"
-      enum:
-        - setSignalRed
-        - setSignalGreen
-        - stopVending
-        - startVending
+      type: "object"
+      oneOf:
+          - type: "string"
+            enum: 
+            - setSignalRed
+            - setSignalGreen
+            - mainPowerOff
+            - mainPowerOn
+          - $ref: "#/components/schemas/RefillPaperRollCommand"
     MachineLocation:
       type: "string"
       enum: 
