@@ -281,13 +281,6 @@ paths:
           description: "No Ticket with the supplied uuid has been found."
 components:
   schemas:
-    PaymentMethod:
-      oneOf:
-        - $ref: "#/components/schemas/FaehrCardPayment"
-        - $ref: "#/components/schemas/CashPayment"
-        - $ref: "#/components/schemas/ECCardPayment"
-        - $ref: "#/components/schemas/BankTransferPayment"
-        - $ref: "#/components/schemas/PayPalPayment"
     FaehrCardPayment:
       description: "Payment Details for FaehrCard Payments."
       type: "object"
@@ -343,7 +336,12 @@ components:
             - "BankTransfer"           
             - "PayPal"           
         details:
-          $ref: "#/components/schemas/PaymentMethod"
+          oneOf:
+            - $ref: "#/components/schemas/FaehrCardPayment"
+            - $ref: "#/components/schemas/CashPayment"
+            - $ref: "#/components/schemas/ECCardPayment"
+            - $ref: "#/components/schemas/BankTransferPayment"
+            - $ref: "#/components/schemas/PayPalPayment"
     TicketSale:
       description: "A collection of tickets that are paid and used at once."
       type: "object"
