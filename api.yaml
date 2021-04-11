@@ -335,6 +335,14 @@ components:
         amount: 
           type: "integer"
         method:
+          type: "string"
+          enum: 
+            - "FährCard"           
+            - "Cash"           
+            - "ECCard"           
+            - "BankTransfer"           
+            - "PayPal"           
+        details:
           $ref: "#/components/schemas/PaymentMethod"
     TicketSale:
       description: "A collection of tickets that are paid and used at once."
