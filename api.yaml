@@ -250,7 +250,7 @@ paths:
           description: "invalid id"
         404:
           description: "no FaehrCard with given uuid found"
-  /ticketSales:
+  /ticketSales/faehrcard:
     post:
       description: "Add a ticket sale."
       requestBody:
@@ -258,7 +258,31 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TicketSale"
+              $ref: "#/components/schemas/TicketSaleFaehrCard"
+      responses:
+        201:
+          description: "The ticket sale has been recorded, if applicable, payment methods have been charged"
+  /ticketSales/ec:
+    post:
+      description: "Add a ticket sale."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketSaleECCard"
+      responses:
+        201:
+          description: "The ticket sale has been recorded, if applicable, payment methods have been charged"
+  /ticketSales/cash:
+    post:
+      description: "Add a ticket sale."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketSaleCash"
       responses:
         201:
           description: "The ticket sale has been recorded, if applicable, payment methods have been charged"
@@ -289,6 +313,8 @@ components:
           description: "UUID of the FaehrCard charged."
           type: "string"
           format: "uuid"
+        payment:
+          $ref: "#/components/schemas/Payment"
     CashPayment:
       description: "Payment Details for Cash Payments."
       type: "object"
@@ -303,21 +329,29 @@ components:
           type: "array"
           items: 
             type: "integer"
+        payment:
+          $ref: "#/components/schemas/Payment"
     ECCardPayment:
       type: "object"
       properties: 
         name: 
           type: "string"
+        payment:
+          $ref: "#/components/schemas/Payment"
     BankTransferPayment:
       type: "object"
       properties: 
         name: 
           type: "string"
+        payment:
+          $ref: "#/components/schemas/Payment"
     PayPalPayment:
       type: "object"
       properties: 
         name: 
           type: "string"
+        payment:
+          $ref: "#/components/schemas/Payment"
     Payment:
       description: "A payment for a ticket sale."
       type: "object"
@@ -327,22 +361,7 @@ components:
           format: "uuid"
         amount: 
           type: "integer"
-        method:
-          type: "string"
-          enum: 
-            - "FährCard"           
-            - "Cash"           
-            - "ECCard"           
-            - "BankTransfer"           
-            - "PayPal"           
-        details:
-          oneOf:
-            - $ref: "#/components/schemas/FaehrCardPayment"
-            - $ref: "#/components/schemas/CashPayment"
-            - $ref: "#/components/schemas/ECCardPayment"
-            - $ref: "#/components/schemas/BankTransferPayment"
-            - $ref: "#/components/schemas/PayPalPayment"
-    TicketSale:
+    TicketSaleFaehrCard:
       description: "A collection of tickets that are paid and used at once."
       type: "object"
       properties:
@@ -360,8 +379,92 @@ components:
           nullable: true
         from:
           $ref: "#/components/schemas/MachineLocation"
-        payment:
-          $ref: "#/components/schemas/Payment"
+        faehrCardPayment:
+          $ref: "#/components/schemas/FaehrCardPayment"
+        positions:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Position"
+        saleCounter:
+          type: "integer"
+        signature:
+          type: "string"
+    TicketSaleECCard:
+      description: "A collection of tickets that are paid and used at once."
+      type: "object"
+      properties:
+        uuid: 
+          type: "string"
+          format: "uuid"
+        issuedBy:
+          type: "string"
+          format: "uuid"
+        issuedAt:
+          type: "string"
+          format: "date-time"
+        returnValid:
+          type: "boolean"
+          nullable: true
+        from:
+          $ref: "#/components/schemas/MachineLocation"
+        ecCardPayment:
+          $ref: "#/components/schemas/ECCardPayment"
+        positions:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Position"
+        saleCounter:
+          type: "integer"
+        signature:
+          type: "string"
+    TicketSaleCash:
+      description: "A collection of tickets that are paid and used at once."
+      type: "object"
+      properties:
+        uuid: 
+          type: "string"
+          format: "uuid"
+        issuedBy:
+          type: "string"
+          format: "uuid"
+        issuedAt:
+          type: "string"
+          format: "date-time"
+        returnValid:
+          type: "boolean"
+          nullable: true
+        from:
+          $ref: "#/components/schemas/MachineLocation"
+        cashPayment:
+          $ref: "#/components/schemas/CashPayment"
+        positions:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Position"
+        saleCounter:
+          type: "integer"
+        signature:
+          type: "string"
+    TicketSalePayPal:
+      description: "A collection of tickets that are paid and used at once."
+      type: "object"
+      properties:
+        uuid: 
+          type: "string"
+          format: "uuid"
+        issuedBy:
+          type: "string"
+          format: "uuid"
+        issuedAt:
+          type: "string"
+          format: "date-time"
+        returnValid:
+          type: "boolean"
+          nullable: true
+        from:
+          $ref: "#/components/schemas/MachineLocation"
+        payPalPayment:
+          $ref: "#/components/schemas/PayPalPayment"
         positions:
           type: "array"
           items:
@@ -414,7 +517,7 @@ components:
         paid:
           type: "integer"
         payment:
-          $ref: "#/components/schemas/Payment"
+          $ref: "#/components/schemas/FaehrCardPayment"
         initial:
           description: "Describes whether the top up was done when the card was issued"
           type: "boolean"
