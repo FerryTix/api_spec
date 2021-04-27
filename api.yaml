@@ -360,7 +360,15 @@ components:
           type: "string"
           format: "uuid"
         amount: 
-          type: "integer"
+          type: "integer"        
+        method:
+          type: "string"
+          enum: 
+            - "FährCard"           
+            - "Cash"           
+            - "ECCard"           
+            - "BankTransfer"           
+            - "PayPal"   
     TicketSaleFaehrCard:
       description: "A collection of tickets that are paid and used at once."
       type: "object"
